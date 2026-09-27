@@ -42,16 +42,30 @@ jobs:
           java-version: '21'
           cache: 'maven'
 
+      - name: Build LOS backend (skip tests)
+        run: ./mvnw -DskipTests package -q
+
       - name: Start LOS backend
         run: |
-          ./mvnw spring-boot:run &
-          for i in {1..30}; do
+          JAR=$(find . -name '*.jar' -path '*/target/*' ! -name '*sources*' ! -name '*javadoc*' | head -1)
+          echo "Starting jar: $JAR"
+          java -jar "$JAR" &
+          BACKEND_PID=$!
+          echo "Backend PID: $BACKEND_PID"
+          for i in {1..90}; do
             if curl -sf http://localhost:8082/actuator/health > /dev/null; then
-              echo "Backend is up."
-              break
+              echo "Backend is up after $((i * 2))s."
+              exit 0
             fi
+            if ! kill -0 "$BACKEND_PID" 2>/dev/null; then
+              echo "Backend process died unexpectedly."
+              exit 1
+            fi
+            echo "  Attempt $i/90 — waiting..."
             sleep 2
           done
+          echo "Timed out after 180s waiting for backend to start."
+          exit 1
 
       - name: Fetch LOS OpenAPI spec
         run: curl -sSf http://localhost:8082/v3/api-docs -o /tmp/los-spec-new.json
@@ -123,4 +137,3 @@ jobs:
             `frontend/src/app/api/` from it.
           branch: chore/los-spec-sync
           delete-branch: true
-

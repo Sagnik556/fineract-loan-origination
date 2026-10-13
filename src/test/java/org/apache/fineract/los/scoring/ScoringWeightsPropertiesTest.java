@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Unit tests for {@link ScoringWeightsProperties}.
  *
- * <p>No Spring context loaded — pure unit tests exercising the startup validation logic directly.
+ * No Spring context loaded — pure unit tests exercising the startup validation logic directly.
  */
 @DisplayName("ScoringWeightsProperties")
 class ScoringWeightsPropertiesTest {

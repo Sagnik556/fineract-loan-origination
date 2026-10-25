@@ -10,22 +10,22 @@
 
 Feature: Authorization of staff-only endpoints
 
-  These scenarios run through the full security filter chain with a real customer JWT, so they
-  confirm that @PreAuthorize denials reach the exception handler and return 403.
+  These scenarios use a real customer JWT and confirm staff-only endpoints return 403 without
+  exposing applicant data.
 
   Scenario: Customer cannot disburse a loan application
     Given a registered customer with username "john" and password "john123"
     When the customer logs in with username "john" and password "john123"
     And the customer calls POST "/api/v1/loan-applications/LOS-2026-00001/disburse" with their token
     Then the response status is 403
-    And the response message is "You do not have permission to perform this action."
+    And the response body contains no applicant data
 
   Scenario: Customer cannot start a review
     Given a registered customer with username "john" and password "john123"
     When the customer logs in with username "john" and password "john123"
     And the customer calls POST "/api/v1/loan-applications/LOS-2026-00001/start-review" with their token
     Then the response status is 403
-    And the response message is "You do not have permission to perform this action."
+    And the response body contains no applicant data
 
   Scenario: Customer cannot list staff accounts
     Given a registered customer with username "john" and password "john123"

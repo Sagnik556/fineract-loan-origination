@@ -100,6 +100,12 @@ public class CustomerAuthSteps {
     assertThat(response.jsonPath().getString("message")).isEqualTo(message);
   }
 
+  @Then("the response body contains no applicant data")
+  public void theResponseBodyContainsNoApplicantData() {
+    assertThat(response.getBody().asString())
+        .doesNotContain("applicantName", "nationalId", "creditScore", "monthlyIncome");
+  }
+
   @Then("the response contains a JWT token")
   public void theResponseContainsAJwtToken() {
     String token = response.jsonPath().getString("token");
